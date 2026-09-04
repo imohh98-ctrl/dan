@@ -45,6 +45,18 @@
     <string name="privacy_ump_btn">فتح نموذج خيارات الخصوصية والموافقة</string>
     <string name="server_sync_title">تحديث ومزامنة الروايات</string>
     <string name="server_sync_desc">جلب آخر النسخ والأغلفة من السيرفر المخصص</string>
-    <string name="share_app_text">استمتع بقراءة روائع وروايات الكاتب العالمي تشارلز ديكنز بالعربية والإنجليزية مع تطبيق روايات تشارلز ديكنز: https://play.google.com/store/apps/details?id=com.aistudio.charlesdickensnovels.cdread</string>
-    <string name="more_apps_url">https://play.google.com/store/apps/developer?id=Google</string>
+    <string name="share_app_text">استمتع بقراءة روائع وروايات الكاتب العالمي تشارلز ديكنز بالعربية والإنجليزية مع تطبيق روايات تشارلز ديكنز: https://play.google.com/store/apps/details?id=com.spinel.dickens</string>
+    <string name="share_app_url">https://play.google.com/store/apps/details?id=com.spinel.dickens</string>
+    <string name="more_apps_url">https://play.google.com/store/apps/dev?id=7189513262046406321</string>
+    <string name="tab_home">الرئيسية</string>
+    <string name="tab_search">البحث</string>
+    <string name="theme_mode_title">مظهر التطبيق</string>
+    <string name="theme_mode_system">تلقائي (حسب الهاتف)</string>
+    <string name="theme_mode_light">الوضع النهاري (فاتح)</string>
+    <string name="theme_mode_dark">الوضع المظلم (ليلي)</string>
+    <string name="search_hint">ابحث باسم الرواية...</string>
+    <string name="search_empty_title">لا توجد نتائج مطابقة</string>
+    <string name="search_empty_desc">تأكد من كتابة اسم الرواية بشكل صحيح</string>
+    <string name="search_title">البحث في الروايات</string>
+    <string name="search_bar_placeholder">اكتب اسم الكتاب هنا...</string>
 </resources>

@@ -32,7 +32,15 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.filled.Brightness4
+import androidx.compose.material.icons.filled.BrightnessAuto
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
+import com.example.ui.viewmodel.AppThemeMode
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -70,10 +78,11 @@ fun SettingsScreen(
     uiState: NovelsUiState,
     umpConsentManager: UmpConsentManager,
     onLanguageChange: (AppLanguage) -> Unit,
+    onThemeChange: (AppThemeMode) -> Unit = {},
     onSyncServer: (String) -> Unit,
     onClearNovels: () -> Unit = {},
     onLoadDefaultNovels: () -> Unit = {},
-    onBack: () -> Unit,
+    onBack: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -88,11 +97,13 @@ fun SettingsScreen(
             TopAppBar(
                 title = { Text(stringResource(id = R.string.screen_settings)) },
                 navigationIcon = {
-                    IconButton(onClick = onBack, modifier = Modifier.testTag("settings_back_btn")) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
+                    if (onBack != null) {
+                        IconButton(onClick = onBack, modifier = Modifier.testTag("settings_back_btn")) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -110,7 +121,7 @@ fun SettingsScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
-            // 1. Language Section
+            // 1. Language Section (Arabic / English toggle with default system language)
             Surface(
                 shape = RoundedCornerShape(16.dp),
                 color = MaterialTheme.colorScheme.surface,
@@ -139,6 +150,79 @@ fun SettingsScreen(
                         LanguageSwitcher(
                             currentLanguage = uiState.currentLanguage,
                             onLanguageSelected = onLanguageChange
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // 2. Theme Mode Section (Light / Dark / System Default)
+            Surface(
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surface,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Palette,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(22.dp)
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = stringResource(id = R.string.theme_mode_title),
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        FilterChip(
+                            selected = uiState.appThemeMode == AppThemeMode.SYSTEM,
+                            onClick = { onThemeChange(AppThemeMode.SYSTEM) },
+                            label = { Text(stringResource(id = R.string.theme_mode_system), style = MaterialTheme.typography.labelSmall) },
+                            leadingIcon = {
+                                Icon(imageVector = Icons.Default.BrightnessAuto, contentDescription = null, modifier = Modifier.size(16.dp))
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            modifier = Modifier.weight(1f).testTag("theme_system_chip")
+                        )
+                        FilterChip(
+                            selected = uiState.appThemeMode == AppThemeMode.LIGHT,
+                            onClick = { onThemeChange(AppThemeMode.LIGHT) },
+                            label = { Text(stringResource(id = R.string.theme_mode_light), style = MaterialTheme.typography.labelSmall) },
+                            leadingIcon = {
+                                Icon(imageVector = Icons.Default.LightMode, contentDescription = null, modifier = Modifier.size(16.dp))
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            modifier = Modifier.weight(1f).testTag("theme_light_chip")
+                        )
+                        FilterChip(
+                            selected = uiState.appThemeMode == AppThemeMode.DARK,
+                            onClick = { onThemeChange(AppThemeMode.DARK) },
+                            label = { Text(stringResource(id = R.string.theme_mode_dark), style = MaterialTheme.typography.labelSmall) },
+                            leadingIcon = {
+                                Icon(imageVector = Icons.Default.DarkMode, contentDescription = null, modifier = Modifier.size(16.dp))
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            modifier = Modifier.weight(1f).testTag("theme_dark_chip")
                         )
                     }
                 }

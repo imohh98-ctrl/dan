@@ -70,15 +70,10 @@ import com.example.util.SafeIntentHelper
 fun HomeScreen(
     uiState: NovelsUiState,
     onBookClick: (String) -> Unit,
-    onLanguageChange: (AppLanguage) -> Unit,
-    onFilterChange: (BookFilter) -> Unit,
-    onSearchChange: (String) -> Unit,
     onRefreshQuote: () -> Unit,
     onOpenBookmarks: () -> Unit,
-    onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
     val isArabic = uiState.currentLanguage == AppLanguage.ARABIC
 
     LazyColumn(
@@ -111,32 +106,15 @@ fun HomeScreen(
                     )
                 }
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    LanguageSwitcher(
-                        currentLanguage = uiState.currentLanguage,
-                        onLanguageSelected = onLanguageChange
+                IconButton(
+                    onClick = onOpenBookmarks,
+                    modifier = Modifier.testTag("bookmarks_nav_button")
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Bookmark,
+                        contentDescription = "Bookmarks",
+                        tint = MaterialTheme.colorScheme.primary
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    IconButton(
-                        onClick = onOpenBookmarks,
-                        modifier = Modifier.testTag("bookmarks_nav_button")
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Bookmark,
-                            contentDescription = "Bookmarks",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                    IconButton(
-                        onClick = onOpenSettings,
-                        modifier = Modifier.testTag("settings_nav_button")
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "Settings",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
                 }
             }
         }
@@ -202,80 +180,6 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(14.dp))
         }
 
-        // Search Bar
-        item {
-            OutlinedTextField(
-                value = uiState.searchQuery,
-                onValueChange = onSearchChange,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("search_text_field"),
-                placeholder = {
-                    Text(
-                        text = if (isArabic) "ابحث عن رواية أو شخصية..." else "Search novels or characters...",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
-                shape = RoundedCornerShape(14.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.surface,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
-                ),
-                singleLine = true
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-        }
-
-        // Category Filter Chips
-        item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 12.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                FilterChip(
-                    selected = uiState.activeFilter == BookFilter.ALL,
-                    onClick = { onFilterChange(BookFilter.ALL) },
-                    label = { Text(stringResource(id = R.string.filter_all)) },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = MaterialTheme.colorScheme.primary,
-                        selectedLabelColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                    modifier = Modifier.testTag("filter_all")
-                )
-                FilterChip(
-                    selected = uiState.activeFilter == BookFilter.ARABIC_ONLY,
-                    onClick = { onFilterChange(BookFilter.ARABIC_ONLY) },
-                    label = { Text(stringResource(id = R.string.filter_arabic)) },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = MaterialTheme.colorScheme.primary,
-                        selectedLabelColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                    modifier = Modifier.testTag("filter_ar")
-                )
-                FilterChip(
-                    selected = uiState.activeFilter == BookFilter.ENGLISH_ONLY,
-                    onClick = { onFilterChange(BookFilter.ENGLISH_ONLY) },
-                    label = { Text(stringResource(id = R.string.filter_english)) },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = MaterialTheme.colorScheme.primary,
-                        selectedLabelColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                    modifier = Modifier.testTag("filter_en")
-                )
-            }
-        }
-
         // Book Cards List
         if (uiState.filteredBooks.isEmpty()) {
             item {
@@ -339,66 +243,7 @@ fun HomeScreen(
                 currentLanguage = uiState.currentLanguage,
                 modifier = Modifier.padding(vertical = 6.dp)
             )
-            Spacer(modifier = Modifier.height(14.dp))
-        }
-
-        // Safe Share and More Apps Action Buttons
-        item {
-            Surface(
-                shape = RoundedCornerShape(16.dp),
-                color = MaterialTheme.colorScheme.surface,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = { SafeIntentHelper.shareApp(context) },
-                        modifier = Modifier
-                            .weight(1f)
-                            .testTag("share_app_button"),
-                        shape = RoundedCornerShape(10.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Share,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = stringResource(id = R.string.btn_share_app),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    }
-
-                    ElevatedButton(
-                        onClick = { SafeIntentHelper.openMoreApps(context) },
-                        modifier = Modifier
-                            .weight(1f)
-                            .testTag("more_apps_button"),
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.elevatedButtonColors(
-                            containerColor = MaterialTheme.colorScheme.secondary,
-                            contentColor = MaterialTheme.colorScheme.onSecondary
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Apps,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = stringResource(id = R.string.btn_more_apps),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

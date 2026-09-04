@@ -40,12 +40,17 @@ object SafeIntentHelper {
     }
 
     fun shareApp(context: Context) {
-        val shareMessage = context.getString(R.string.share_app_text)
+        val shareUrl = "https://play.google.com/store/apps/details?id=com.spinel.dickens"
+        val shareMessage = if (context.resources.configuration.locales.get(0).language.startsWith("ar")) {
+            "استمتع بقراءة روائع روايات تشارلز ديكنز عبر التطبيق:\n$shareUrl"
+        } else {
+            "Enjoy reading Charles Dickens classic novels with this app:\n$shareUrl"
+        }
         shareText(context, shareMessage, context.getString(R.string.btn_share_app))
     }
 
     fun openMoreApps(context: Context) {
-        val url = context.getString(R.string.more_apps_url)
+        val url = "https://play.google.com/store/apps/dev?id=7189513262046406321"
         openWebUrl(context, url)
     }
 }

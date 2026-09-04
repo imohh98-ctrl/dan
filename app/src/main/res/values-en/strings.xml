@@ -45,6 +45,18 @@
     <string name="privacy_ump_btn">Open Privacy &amp; Consent Options</string>
     <string name="server_sync_title">Update &amp; Sync Novels</string>
     <string name="server_sync_desc">Fetch latest copies and covers from custom server</string>
-    <string name="share_app_text">Enjoy the masterpieces and classic novels of Charles Dickens in Arabic and English with Charles Dickens Novels app: https://play.google.com/store/apps/details?id=com.aistudio.charlesdickensnovels.cdread</string>
-    <string name="more_apps_url">https://play.google.com/store/apps/developer?id=Google</string>
+    <string name="share_app_text">Enjoy the masterpieces and classic novels of Charles Dickens in Arabic and English with Charles Dickens Novels app: https://play.google.com/store/apps/details?id=com.spinel.dickens</string>
+    <string name="share_app_url">https://play.google.com/store/apps/details?id=com.spinel.dickens</string>
+    <string name="more_apps_url">https://play.google.com/store/apps/dev?id=7189513262046406321</string>
+    <string name="tab_home">Home</string>
+    <string name="tab_search">Search</string>
+    <string name="theme_mode_title">App Appearance</string>
+    <string name="theme_mode_system">System Default</string>
+    <string name="theme_mode_light">Light Mode</string>
+    <string name="theme_mode_dark">Dark Mode</string>
+    <string name="search_hint">Search novel title...</string>
+    <string name="search_empty_title">No matching novels found</string>
+    <string name="search_empty_desc">Make sure the novel title is spelled correctly</string>
+    <string name="search_title">Search Novels</string>
+    <string name="search_bar_placeholder">Type book title here...</string>
 </resources>

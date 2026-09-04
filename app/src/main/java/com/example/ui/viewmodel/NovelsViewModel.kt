@@ -27,6 +27,12 @@ enum class AppLanguage {
     ENGLISH
 }
 
+enum class AppThemeMode {
+    SYSTEM,
+    LIGHT,
+    DARK
+}
+
 enum class BookFilter {
     ALL,
     ARABIC_ONLY,
@@ -39,6 +45,7 @@ data class NovelsUiState(
     val activeFilter: BookFilter = BookFilter.ALL,
     val searchQuery: String = "",
     val currentLanguage: AppLanguage = AppLanguage.ARABIC,
+    val appThemeMode: AppThemeMode = AppThemeMode.SYSTEM,
     val activeQuote: Quote = DickensNovelsRepository.dickensQuotes.first(),
     val readingProgressMap: Map<String, ReadingProgress> = emptyMap(),
     val bookmarks: List<Bookmark> = emptyList(),
@@ -56,10 +63,18 @@ class NovelsViewModel(application: Application) : AndroidViewModel(application) 
     private val database = AppDatabase.getInstance(application)
     val repository = DickensNovelsRepository(database, application)
 
+    // Detect system language as default
+    private val systemDefaultLanguage: AppLanguage = run {
+        val systemLocale = application.resources.configuration.locales.get(0)
+        if (systemLocale.language.startsWith("ar")) AppLanguage.ARABIC else AppLanguage.ENGLISH
+    }
+
     private val _uiState = MutableStateFlow(
         NovelsUiState(
             books = emptyList(),
             filteredBooks = emptyList(),
+            currentLanguage = systemDefaultLanguage,
+            appThemeMode = AppThemeMode.SYSTEM,
             activeQuote = repository.getRandomQuote()
         )
     )
@@ -71,7 +86,11 @@ class NovelsViewModel(application: Application) : AndroidViewModel(application) 
             repository.books.collect { bookList ->
                 _uiState.value = _uiState.value.copy(
                     books = bookList,
-                    filteredBooks = applyFilters(bookList, _uiState.value.activeFilter, _uiState.value.searchQuery)
+                    filteredBooks = applyFilters(
+                        bookList,
+                        _uiState.value.currentLanguage,
+                        _uiState.value.searchQuery
+                    )
                 )
             }
         }
@@ -98,12 +117,19 @@ class NovelsViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun setLanguage(language: AppLanguage) {
-        _uiState.value = _uiState.value.copy(currentLanguage = language)
+        _uiState.value = _uiState.value.copy(
+            currentLanguage = language,
+            filteredBooks = applyFilters(_uiState.value.books, language, _uiState.value.searchQuery)
+        )
     }
 
     fun toggleLanguage() {
         val next = if (_uiState.value.currentLanguage == AppLanguage.ARABIC) AppLanguage.ENGLISH else AppLanguage.ARABIC
         setLanguage(next)
+    }
+
+    fun setAppThemeMode(themeMode: AppThemeMode) {
+        _uiState.value = _uiState.value.copy(appThemeMode = themeMode)
     }
 
     val layoutDirection: LayoutDirection
@@ -112,33 +138,37 @@ class NovelsViewModel(application: Application) : AndroidViewModel(application) 
     fun setFilter(filter: BookFilter) {
         _uiState.value = _uiState.value.copy(
             activeFilter = filter,
-            filteredBooks = applyFilters(_uiState.value.books, filter, _uiState.value.searchQuery)
+            filteredBooks = applyFilters(_uiState.value.books, _uiState.value.currentLanguage, _uiState.value.searchQuery)
         )
     }
 
     fun setSearchQuery(query: String) {
         _uiState.value = _uiState.value.copy(
             searchQuery = query,
-            filteredBooks = applyFilters(_uiState.value.books, _uiState.value.activeFilter, query)
+            filteredBooks = applyFilters(_uiState.value.books, _uiState.value.currentLanguage, query)
         )
     }
 
-    private fun applyFilters(books: List<Book>, filter: BookFilter, query: String): List<Book> {
+    /**
+     * Filters books based on:
+     * 1. App language:
+     *    - ARABIC language: Show Arabic novels (ARABIC or BILINGUAL)
+     *    - ENGLISH language: Show English novels (ENGLISH or BILINGUAL)
+     * 2. Search query: Matches ONLY the book title (as requested: "البحث يبحث عن اسم الكتاب وليس عن نص داخل الكتب")
+     */
+    private fun applyFilters(books: List<Book>, language: AppLanguage, query: String): List<Book> {
         return books.filter { book ->
-            val matchesFilter = when (filter) {
-                BookFilter.ALL -> true
-                BookFilter.ARABIC_ONLY -> book.language == BookLanguage.ARABIC || book.language == BookLanguage.BILINGUAL
-                BookFilter.ENGLISH_ONLY -> book.language == BookLanguage.ENGLISH || book.language == BookLanguage.BILINGUAL
+            val matchesLanguage = when (language) {
+                AppLanguage.ARABIC -> book.language == BookLanguage.ARABIC || book.language == BookLanguage.BILINGUAL
+                AppLanguage.ENGLISH -> book.language == BookLanguage.ENGLISH || book.language == BookLanguage.BILINGUAL
             }
-            val matchesQuery = if (query.isBlank()) {
+            val matchesTitleOnly = if (query.isBlank()) {
                 true
             } else {
                 book.titleAr.contains(query, ignoreCase = true) ||
-                        book.titleEn.contains(query, ignoreCase = true) ||
-                        book.descAr.contains(query, ignoreCase = true) ||
-                        book.descEn.contains(query, ignoreCase = true)
+                        book.titleEn.contains(query, ignoreCase = true)
             }
-            matchesFilter && matchesQuery
+            matchesLanguage && matchesTitleOnly
         }
     }
 

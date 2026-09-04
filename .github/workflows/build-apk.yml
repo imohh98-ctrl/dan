@@ -49,7 +49,7 @@ jobs:
                 "client_info": {
                   "mobilesdk_app_id": "1:1234567890:android:abcdef123456",
                   "android_client_info": {
-                    "package_name": "com.aistudio.charlesdickensnovels.cdread"
+                    "package_name": "com.spinel.dickens"
                   }
                 },
                 "oauth_client": [],

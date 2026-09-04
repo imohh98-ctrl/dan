@@ -6,6 +6,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import com.example.ui.viewmodel.AppThemeMode
 
 private val DarkColorScheme = darkColorScheme(
     primary = VictorianGoldPrimary,
@@ -49,10 +50,16 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun CharlesDickensTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    appThemeMode: AppThemeMode = AppThemeMode.SYSTEM,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+    val systemDark = isSystemInDarkTheme()
+    val isDark = when (appThemeMode) {
+        AppThemeMode.SYSTEM -> systemDark
+        AppThemeMode.LIGHT -> false
+        AppThemeMode.DARK -> true
+    }
+    val colorScheme = if (isDark) DarkColorScheme else LightColorScheme
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
