@@ -22,6 +22,54 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: Restore or Generate Debug Keystore
+        run: |
+          if [ -f "debug.keystore.base64" ]; then
+            echo "Decoding debug.keystore from base64..."
+            base64 -d debug.keystore.base64 > debug.keystore
+          elif [ ! -f "debug.keystore" ]; then
+            echo "Generating new debug.keystore..."
+            keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          fi
+          ls -la debug.keystore
+
+      - name: Create mock google-services.json if missing
+        run: |
+          if [ ! -f "app/google-services.json" ]; then
+            echo "Creating placeholder google-services.json..."
+            cat << 'EOF' > app/google-services.json
+          {
+            "project_info": {
+              "project_number": "1234567890",
+              "project_id": "dickens-novels-app",
+              "storage_bucket": "dickens-novels-app.appspot.com"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:1234567890:android:abcdef123456",
+                  "android_client_info": {
+                    "package_name": "com.aistudio.charlesdickensnovels.cdread"
+                  }
+                },
+                "oauth_client": [],
+                "api_key": [
+                  {
+                    "current_key": "fake_api_key_for_build"
+                  }
+                ],
+                "services": {
+                  "appinvite_service": {
+                    "other_platform_oauth_client": []
+                  }
+                }
+              }
+            ],
+            "configuration_version": "1"
+          }
+          EOF
+          fi
+
       - name: Grant execute permission for gradlew
         run: |
           if [ -f "./gradlew" ]; then
@@ -31,14 +79,14 @@ jobs:
       - name: Build Debug APK
         run: |
           if [ -f "./gradlew" ]; then
-            ./gradlew assembleDebug --stacktrace
+            ./gradlew assembleDebug --no-daemon --stacktrace
           else
-            gradle assembleDebug --stacktrace
+            gradle assembleDebug --no-daemon --stacktrace
           fi
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug
+          name: app-debug-apk
           path: app/build/outputs/apk/debug/*.apk
           retention-days: 7
