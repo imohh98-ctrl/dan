@@ -2,7 +2,9 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
   workflow_dispatch:
 
 jobs:
@@ -10,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
@@ -26,16 +28,17 @@ jobs:
             chmod +x gradlew
           fi
 
-      - name: Build APK
+      - name: Build Debug APK
         run: |
           if [ -f "./gradlew" ]; then
-            ./gradlew assembleDebug
+            ./gradlew assembleDebug --stacktrace
           else
-            gradle assembleDebug
+            gradle assembleDebug --stacktrace
           fi
 
-      - name: Upload APK
+      - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug-apk
+          name: app-debug
           path: app/build/outputs/apk/debug/*.apk
+          retention-days: 7
