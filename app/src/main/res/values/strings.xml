@@ -1,0 +1,50 @@
+<resources>
+    <string name="app_name">روايات تشارلز ديكنز</string>
+    <string name="app_tagline">روائع الأدب الفيكتوري بين يديك</string>
+    <string name="tab_books">المكتبة</string>
+    <string name="tab_bookmarks">العلامات</string>
+    <string name="tab_settings">الإعدادات</string>
+    <string name="screen_bookmarks">العلامات المرجعية</string>
+    <string name="screen_settings">الإعدادات</string>
+    <string name="section_quote_title">اقتباس اليوم من تشارلز ديكنز</string>
+    <string name="btn_share_quote">مشاركة الاقتباس</string>
+    <string name="btn_share_app">مشاركة التطبيق</string>
+    <string name="btn_more_apps">المزيد من تطبيقاتنا</string>
+    <string name="language_title">لغة التطبيق</string>
+    <string name="language_switch">تغيير لغة العرض</string>
+    <string name="language_ar">العربية</string>
+    <string name="language_en">English</string>
+    <string name="filter_all">جميع الروايات</string>
+    <string name="filter_arabic">روايات بالعربية</string>
+    <string name="filter_english">Novels in English</string>
+    <string name="btn_start_reading">بدء القراءة</string>
+    <string name="btn_continue_reading">متابعة القراءة</string>
+    <string name="reading_progress">التقدم في القراءة</string>
+    <string name="chapter_list">فصول الرواية</string>
+    <string name="no_bookmarks">لا توجد علامات مرجعية حتى الآن</string>
+    <string name="bookmark_added">تمت إضافة علامة مرجعية</string>
+    <string name="bookmark_saved">تم حفظ العلامة المرجعية</string>
+    <string name="bookmark_removed">تم حذف العلامة المرجعية</string>
+    <string name="reader_font_size">حجم الخط</string>
+    <string name="reader_theme">مظهر القراءة</string>
+    <string name="reader_theme_parchment">ورق كلاسيكي</string>
+    <string name="reader_theme_cream">ورق كريمي</string>
+    <string name="reader_theme_sepia">بني عتيق (سيبيا)</string>
+    <string name="reader_theme_dark">ليلي مريح</string>
+    <string name="reader_theme_white">أبيض نقي</string>
+    <string name="reader_auto_scroll">قراءة تلقائية</string>
+    <string name="reader_auto_scroll_speed">سرعة التمرير</string>
+    <string name="reader_distraction_free">وضع ملء الشاشة بدون تشتيت</string>
+    <string name="reader_pdf_zoom">تكبير النص والصفحة</string>
+    <string name="ad_sponsored">إعلان مدعوم</string>
+    <string name="ad_placeholder_title">محتوى مميز لقرّاء الأدب</string>
+    <string name="ad_placeholder_desc">اكتشف تطبيقات وكتب مختارة بعناية لعشاق الأدب العالمي.</string>
+    <string name="privacy_consent_title">إدارة الخصوصية والموافقة (UMP)</string>
+    <string name="privacy_consent_desc">تعديل خيارات الموافقة على الإعلانات والخصوصية</string>
+    <string name="privacy_ump_title">إدارة موافقة الإعلانات والخصوصية (Google UMP)</string>
+    <string name="privacy_ump_btn">فتح نموذج خيارات الخصوصية والموافقة</string>
+    <string name="server_sync_title">تحديث ومزامنة الروايات</string>
+    <string name="server_sync_desc">جلب آخر النسخ والأغلفة من السيرفر المخصص</string>
+    <string name="share_app_text">استمتع بقراءة روائع وروايات الكاتب العالمي تشارلز ديكنز بالعربية والإنجليزية مع تطبيق روايات تشارلز ديكنز: https://play.google.com/store/apps/details?id=com.aistudio.charlesdickensnovels.cdread</string>
+    <string name="more_apps_url">https://play.google.com/store/apps/developer?id=Google</string>
+</resources>
