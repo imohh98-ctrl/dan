@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Apps
@@ -225,7 +226,7 @@ fun HomeScreen(
                 }
             }
         } else {
-            items(uiState.filteredBooks, key = { it.id }) { book ->
+            itemsIndexed(uiState.filteredBooks, key = { _, book -> book.id }) { index, book ->
                 val progress = uiState.readingProgressMap[book.id]
                 BookCard(
                     book = book,
@@ -234,16 +235,17 @@ fun HomeScreen(
                     onClick = { onBookClick(book.id) },
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
-            }
-        }
 
-        // Native Ad Card (Integrated elegantly so it never spoils reading experience)
-        item {
-            NativeAdCard(
-                currentLanguage = uiState.currentLanguage,
-                modifier = Modifier.padding(vertical = 6.dp)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+                // Insert ONE Native Ad after every SIX book items (at positions 6, 12, 18, etc.)
+                if ((index + 1) % 6 == 0) {
+                    NativeAdCard(
+                        currentLanguage = uiState.currentLanguage,
+                        modifier = Modifier
+                            .padding(bottom = 12.dp)
+                            .testTag("home_native_ad_${(index + 1) / 6}")
+                    )
+                }
+            }
         }
     }
 }

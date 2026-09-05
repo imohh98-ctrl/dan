@@ -78,6 +78,7 @@ import com.example.data.model.Book
 import com.example.data.model.Chapter
 import com.example.data.model.ReaderThemeMode
 import com.example.data.model.ReadingSettings
+import com.example.ui.components.AdBannerView
 import com.example.ui.components.ChaptersBottomSheet
 import com.example.ui.components.ReadingControlsSheet
 import com.example.ui.theme.ReaderCreamBg
@@ -384,7 +385,16 @@ fun ReaderScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(36.dp))
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // AdMob Banner Ad placed at the end of the chapter content
+                AdBannerView(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp)
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
                 HorizontalDivider(color = readerTextColor.copy(alpha = 0.2f))
                 Spacer(modifier = Modifier.height(18.dp))
 

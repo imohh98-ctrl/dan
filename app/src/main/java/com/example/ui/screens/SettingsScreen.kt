@@ -87,7 +87,6 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val isArabic = uiState.currentLanguage == AppLanguage.ARABIC
-    var serverUrlInput by remember { mutableStateOf("https://my-dickens-server.example.com/api/novels") }
 
     Scaffold(
         modifier = modifier
@@ -228,217 +227,56 @@ fun SettingsScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
-
-            // 2. Google UMP Consent & Privacy Form Section (GDPR / EEA / UK / Switzerland)
-            Surface(
-                shape = RoundedCornerShape(16.dp),
-                color = MaterialTheme.colorScheme.surface,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.Security,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(22.dp)
-                        )
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Text(
-                            text = stringResource(id = R.string.privacy_ump_title),
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = if (isArabic)
-                            "منظومة Google UMP الخاصة بإدارة موافقة المستخدم على الإعلانات والخصوصية للامتثال لسياسات Google Play ومتطلبات EEA والمملكة المتحدة."
-                        else
-                            "Google User Messaging Platform (UMP) for managing consent and privacy compliance in EEA, UK, and Switzerland.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        lineHeight = 18.sp
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    OutlinedButton(
-                        onClick = {
-                            if (context is Activity) {
-                                umpConsentManager.showPrivacyOptionsForm(context) {
-                                    Toast.makeText(
-                                        context,
-                                        if (isArabic) "تم تحديث خيارات الموافقة" else "Privacy options updated",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag("privacy_ump_button"),
-                        shape = RoundedCornerShape(10.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Policy,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(id = R.string.privacy_ump_btn),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            // 3. User Remote Server Integration Section
-            Surface(
-                shape = RoundedCornerShape(16.dp),
-                color = MaterialTheme.colorScheme.surface,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.Storage,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(22.dp)
-                        )
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Text(
-                            text = if (isArabic) "سيرفر الكتب والمزامنة الخارجية" else "Custom Book Server & Sync",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    Text(
-                        text = if (isArabic)
-                            "يمكنك ربط التطبيق بسيرفرك الخاص لتحميل المزيد من الكتب والأغلفة بصيغة PDF والنصوص:"
-                        else
-                            "Connect the app to your private server to fetch additional novels and covers:",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    OutlinedTextField(
-                        value = serverUrlInput,
-                        onValueChange = { serverUrlInput = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag("server_url_field"),
-                        label = { Text(if (isArabic) "رابط السيرفر الخاص بك" else "Your Server Endpoint URL") },
-                        shape = RoundedCornerShape(10.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
-                        ),
-                        singleLine = true
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Button(
-                        onClick = { onSyncServer(serverUrlInput) },
-                        enabled = !uiState.isSyncingServer,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag("sync_server_btn"),
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        )
-                    ) {
-                        if (uiState.isSyncingServer) {
-                            CircularProgressIndicator(
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.size(18.dp),
-                                strokeWidth = 2.dp
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = if (isArabic) "جارٍ الاتصال بالمخدم..." else "Connecting to Server...",
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Default.CloudSync,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = if (isArabic) "بدء المزامنة مع السيرفر" else "Sync with Server Now",
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                        }
-                    }
-
-                    if (uiState.serverStatusMessage != null) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = uiState.serverStatusMessage,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.secondary,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(14.dp))
-                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Text(
-                        text = if (isArabic)
-                            "الروايات المحملة حالياً: ${uiState.books.size} رواية"
-                        else
-                            "Currently Loaded Novels: ${uiState.books.size} novels",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
+            // 3. Privacy Options (UMP GDPR / EEA / UK / Switzerland) - Only visible if required by Google UMP
+            if (umpConsentManager.isPrivacyOptionsRequired) {
+                Spacer(modifier = Modifier.height(14.dp))
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        OutlinedButton(
-                            onClick = onClearNovels,
-                            modifier = Modifier
-                                .weight(1f)
-                                .testTag("settings_clear_novels_btn"),
-                            shape = RoundedCornerShape(10.dp)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f)
                         ) {
+                            Icon(
+                                imageVector = Icons.Default.Security,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(22.dp)
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
                             Text(
-                                text = if (isArabic) "إفراغ المكتبة" else "Clear Library",
-                                style = MaterialTheme.typography.labelSmall
+                                text = stringResource(id = R.string.privacy_options),
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold
                             )
                         }
 
                         OutlinedButton(
-                            onClick = onLoadDefaultNovels,
-                            modifier = Modifier
-                                .weight(1f)
-                                .testTag("settings_load_novels_btn"),
+                            onClick = {
+                                if (context is Activity) {
+                                    umpConsentManager.showPrivacyOptionsForm(context) {
+                                        Toast.makeText(
+                                            context,
+                                            if (isArabic) "تم تحديث خيارات الموافقة" else "Privacy options updated",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
+                            },
+                            modifier = Modifier.testTag("privacy_ump_button"),
                             shape = RoundedCornerShape(10.dp)
                         ) {
                             Text(
-                                text = if (isArabic) "تحميل الروايات" else "Load Novels",
+                                text = stringResource(id = R.string.privacy_options),
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }

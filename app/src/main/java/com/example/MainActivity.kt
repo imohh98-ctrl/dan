@@ -1,10 +1,19 @@
 package com.example
 
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
+import com.example.notifications.DickensFirebaseMessagingService
+import com.example.util.SafeIntentHelper
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -26,6 +35,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -64,15 +74,31 @@ class MainActivity : ComponentActivity() {
     private val viewModel: NovelsViewModel by viewModels()
     private val umpConsentManager by lazy { UmpConsentManager(this) }
 
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { _ ->
+        // Notification permission granted/denied handled gracefully
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Create FCM Notification Channel
+        DickensFirebaseMessagingService.createNotificationChannel(this)
+
+        // Request POST_NOTIFICATIONS permission on Android 13+ (API 33+)
+        requestNotificationPermission()
+
+        // Handle URL payload if app was opened from notification
+        handleNotificationIntent(intent)
 
         // 1. Gather GDPR / UMP Consent for EEA / UK / Switzerland
         umpConsentManager.gatherConsent(this) {
             // 2. Initialize AdMob safely once consent is verified
             AdManager.initializeMobileAds(this) {
                 AdManager.loadAppOpenAd(this)
+                AdManager.loadInterstitialAd(this)
             }
         }
 
@@ -92,6 +118,39 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleNotificationIntent(intent)
+    }
+
+    private fun handleNotificationIntent(intent: Intent?) {
+        if (intent == null) return
+        val targetUrl = intent.getStringExtra(DickensFirebaseMessagingService.EXTRA_TARGET_URL)
+            ?: intent.getStringExtra("url")
+            ?: intent.getStringExtra("link")
+
+        if (!targetUrl.isNullOrBlank()) {
+            if (targetUrl.startsWith("https://", ignoreCase = true) ||
+                targetUrl.startsWith("http://", ignoreCase = true)
+            ) {
+                SafeIntentHelper.openWebUrl(this, targetUrl)
+            }
+        }
+    }
+
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         // Safely show App Open ad if available without recreating UI or resetting state
@@ -104,6 +163,7 @@ fun AppNavigation(
     viewModel: NovelsViewModel,
     umpConsentManager: UmpConsentManager
 ) {
+    val context = LocalContext.current
     val navController = rememberNavController()
     val uiState by viewModel.uiState.collectAsState()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -288,9 +348,19 @@ fun AppNavigation(
                         currentLanguage = uiState.currentLanguage,
                         onBack = { navController.popBackStack() },
                         onStartReading = { chapterIdx ->
-                            viewModel.selectBook(bookId)
-                            viewModel.selectChapter(chapterIdx)
-                            navController.navigate(NavRoutes.reader(bookId, chapterIdx))
+                            val activity = context as? Activity
+                            val proceedToReading = {
+                                viewModel.selectBook(bookId)
+                                viewModel.selectChapter(chapterIdx)
+                                navController.navigate(NavRoutes.reader(bookId, chapterIdx))
+                            }
+                            if (activity != null) {
+                                AdManager.showInterstitialAdIfAvailable(activity) {
+                                    proceedToReading()
+                                }
+                            } else {
+                                proceedToReading()
+                            }
                         }
                     )
                 }

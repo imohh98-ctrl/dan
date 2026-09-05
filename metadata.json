@@ -1,5 +1,5 @@
 {
-  "name": "روايات تشارلز ديكنز",
+  "name": "تشارلز ديكنز",
   "description": "تطبيق روايات تشارلز ديكنز بالعربية والإنجليزية مع قارئ مريح وحفظ موضع القراءة ودعم الإعلانات والموافقة UMP",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

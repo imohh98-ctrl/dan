@@ -39,6 +39,7 @@
     <string name="ad_sponsored">Sponsored</string>
     <string name="ad_placeholder_title">Literary Recommendations</string>
     <string name="ad_placeholder_desc">Discover curated literature apps and classic book companions.</string>
+    <string name="privacy_options">Privacy options</string>
     <string name="privacy_consent_title">Privacy &amp; Consent (UMP)</string>
     <string name="privacy_consent_desc">Manage advertising and privacy choices</string>
     <string name="privacy_ump_title">Ad Consent &amp; Privacy (Google UMP)</string>

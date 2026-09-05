@@ -102,6 +102,7 @@ dependencies {
   implementation(libs.play.services.ads)
   implementation(libs.user.messaging.platform)
   implementation(libs.converter.moshi)
+  implementation(libs.firebase.messaging)
   implementation(libs.firebase.ai)
   // Uncomment to use Firestore:
   // implementation(libs.firebase.firestore)

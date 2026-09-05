@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">روايات تشارلز ديكنز</string>
+    <string name="app_name">تشارلز ديكنز</string>
     <string name="app_tagline">روائع الأدب الفيكتوري بين يديك</string>
     <string name="tab_books">المكتبة</string>
     <string name="tab_bookmarks">العلامات</string>
@@ -39,13 +39,14 @@
     <string name="ad_sponsored">إعلان مدعوم</string>
     <string name="ad_placeholder_title">محتوى مميز لقرّاء الأدب</string>
     <string name="ad_placeholder_desc">اكتشف تطبيقات وكتب مختارة بعناية لعشاق الأدب العالمي.</string>
+    <string name="privacy_options">خيارات الخصوصية</string>
     <string name="privacy_consent_title">إدارة الخصوصية والموافقة (UMP)</string>
     <string name="privacy_consent_desc">تعديل خيارات الموافقة على الإعلانات والخصوصية</string>
     <string name="privacy_ump_title">إدارة موافقة الإعلانات والخصوصية (Google UMP)</string>
     <string name="privacy_ump_btn">فتح نموذج خيارات الخصوصية والموافقة</string>
     <string name="server_sync_title">تحديث ومزامنة الروايات</string>
     <string name="server_sync_desc">جلب آخر النسخ والأغلفة من السيرفر المخصص</string>
-    <string name="share_app_text">استمتع بقراءة روائع وروايات الكاتب العالمي تشارلز ديكنز بالعربية والإنجليزية مع تطبيق روايات تشارلز ديكنز: https://play.google.com/store/apps/details?id=com.spinel.dickens</string>
+    <string name="share_app_text">استمتع بقراءة روائع وروايات الكاتب العالمي تشارلز ديكنز بالعربية والإنجليزية مع تطبيق تشارلز ديكنز: https://play.google.com/store/apps/details?id=com.spinel.dickens</string>
     <string name="share_app_url">https://play.google.com/store/apps/details?id=com.spinel.dickens</string>
     <string name="more_apps_url">https://play.google.com/store/apps/dev?id=7189513262046406321</string>
     <string name="tab_home">الرئيسية</string>
@@ -59,4 +60,6 @@
     <string name="search_empty_desc">تأكد من كتابة اسم الرواية بشكل صحيح</string>
     <string name="search_title">البحث في الروايات</string>
     <string name="search_bar_placeholder">اكتب اسم الكتاب هنا...</string>
+    <string name="notification_channel_general_name">إشعارات عامة</string>
+    <string name="notification_channel_general_desc">إشعارات التحديثات والروايات الجديدة</string>
 </resources>
