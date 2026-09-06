@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Launcher and Application Name (Strictly English as requested) -->
+    <string name="app_name">Charles Dickens Library</string>
+    <string name="app_tagline">روائع الأدب الفيكتوري بين يديك</string>
+
+    <!-- Navigation Tabs & Screens -->
+    <string name="tab_home">الرئيسية</string>
+    <string name="tab_search">البحث</string>
+    <string name="tab_books">المكتبة</string>
+    <string name="tab_bookmarks">العلامات</string>
+    <string name="tab_settings">الإعدادات</string>
+    <string name="screen_bookmarks">العلامات المرجعية</string>
+    <string name="screen_settings">الإعدادات</string>
+
+    <!-- Hero & Quotes -->
+    <string name="hero_title">مكتبة تشارلز ديكنز الخالدة</string>
+    <string name="hero_subtitle">رحلة في أعماق لندن وباريس مع روائع الأدب العالمي</string>
+    <string name="section_quote_title">اقتباس اليوم من تشارلز ديكنز</string>
+    <string name="btn_share_quote">مشاركة الاقتباس</string>
+    <string name="quote_share_format">“%1$s”\n— تشارلز ديكنز (%2$s)\n\nتمت المشاركة من تطبيق Charles Dickens Library</string>
+
+    <!-- Home Empty State & Actions -->
+    <string name="empty_library_title">لا توجد روايات في المكتبة حالياً</string>
+    <string name="empty_library_desc">المكتبة فارغة حالياً بدون أي روايات. يمكنك تحديث الروايات متى شئت عبر الإعدادات.</string>
+
+    <!-- Language & Filters -->
+    <string name="language_title">لغة التطبيق</string>
+    <string name="language_switch">تغيير لغة العرض</string>
+    <string name="language_ar">العربية</string>
+    <string name="language_en">English</string>
+    <string name="filter_all">جميع الروايات</string>
+    <string name="filter_arabic">روايات بالعربية</string>
+    <string name="filter_english">Novels in English</string>
+
+    <!-- Reading & Details -->
+    <string name="btn_start_reading">بدء القراءة</string>
+    <string name="btn_continue_reading">متابعة القراءة</string>
+    <string name="reading_progress">التقدم في القراءة</string>
+    <string name="chapter_list">فصول الرواية</string>
+    <string name="parts_and_chapters">الأجزاء والفصول</string>
+    <string name="story_list">قائمة القصص</string>
+    <string name="full_chapters_format">%1$d فصول كاملة</string>
+    <string name="chapters_count_suffix">فصل</string>
+    <string name="chapter_prefix">الفصل</string>
+    <string name="prev_chapter">الفصل السابق</string>
+    <string name="next_chapter">الفصل التالي</string>
+    <string name="share_book_recommend_format">أنصحك بقراءة رواية \"%1$s\" للأديب العالمي تشارلز ديكنز!\nحمل التطبيق واستمتع بأعظم الروايات العالمية.</string>
+    <string name="loading_book_content">جارٍ تحميل محتوى الرواية...</string>
+    <string name="loading_error">تعذر تحميل محتوى الفصل. يرجى التحقق من الاتصال بالإنترنت.</string>
+    <string name="retry">إعادة المحاولة</string>
+
+    <!-- Bookmarks -->
+    <string name="no_bookmarks">لا توجد علامات مرجعية حتى الآن</string>
+    <string name="bookmark_added">تمت إضافة علامة مرجعية</string>
+    <string name="bookmark_saved">تم حفظ العلامة المرجعية</string>
+    <string name="bookmark_removed">تم حذف العلامة المرجعية</string>
+
+    <!-- Reader Controls -->
+    <string name="reader_settings_title">إعدادات القراءة والمظهر</string>
+    <string name="reader_font_size">حجم الخط</string>
+    <string name="reader_theme">مظهر القراءة</string>
+    <string name="reader_theme_parchment">ورق كلاسيكي</string>
+    <string name="reader_theme_cream">ورق كريمي</string>
+    <string name="reader_theme_sepia">بني عتيق (سيبيا)</string>
+    <string name="reader_theme_dark">ليلي مريح</string>
+    <string name="reader_theme_white">أبيض نقي</string>
+    <string name="reader_auto_scroll">قراءة تلقائية</string>
+    <string name="reader_auto_scroll_speed">سرعة التمرير</string>
+    <string name="reader_distraction_free">وضع ملء الشاشة بدون تشتيت</string>
+    <string name="reader_pdf_zoom">تكبير النص والصفحة</string>
+    <string name="auto_scroll_active">التمرير التلقائي نشط (%1$sx)</string>
+    <string name="auto_scroll_paused">متوقفة</string>
+    <string name="auto_scroll_enabled">مفعّلة (%1$sx)</string>
+
+    <!-- Ads -->
+    <string name="ad_badge">إعلان</string>
+    <string name="ad_sponsored">إعلان مدعوم</string>
+    <string name="ad_explore_now">استكشف الآن</string>
+    <string name="ad_placeholder_title">محتوى مميز لقرّاء الأدب</string>
+    <string name="ad_placeholder_desc">اكتشف تطبيقات وكتب مختارة بعناية لعشاق الأدب العالمي.</string>
+
+    <!-- Settings Screen -->
+    <string name="privacy_options">خيارات الخصوصية</string>
+    <string name="privacy_consent_title">إدارة الخصوصية والموافقة (UMP)</string>
+    <string name="privacy_consent_desc">تعديل خيارات الموافقة على الإعلانات والخصوصية</string>
+    <string name="privacy_ump_title">إدارة موافقة الإعلانات والخصوصية (Google UMP)</string>
+    <string name="privacy_ump_btn">فتح نموذج خيارات الخصوصية والموافقة</string>
+    <string name="privacy_updated">تم تحديث خيارات الخصوصية والموافقة</string>
+    <string name="theme_mode_title">مظهر التطبيق</string>
+    <string name="theme_mode_system">تلقائي (حسب الهاتف)</string>
+    <string name="theme_mode_light">الوضع النهاري (فاتح)</string>
+    <string name="theme_mode_dark">الوضع المظلم (ليلي)</string>
+    <string name="share_explore_title">مشاركة ومزيد من التطبيقات</string>
+    <string name="btn_share_app">مشاركة التطبيق</string>
+    <string name="btn_more_apps">المزيد من تطبيقاتنا</string>
+    <string name="server_sync_title">تحديث ومزامنة الروايات</string>
+    <string name="server_sync_desc">جلب آخر النسخ والأغلفة من السيرفر المخصص</string>
+    <string name="share_app_text">استمتع بقراءة روائع وروايات الكاتب العالمي تشارلز ديكنز بالعربية والإنجليزية مع تطبيق Charles Dickens Library: https://play.google.com/store/apps/details?id=com.spinel.dickens</string>
+    <string name="share_app_url">https://play.google.com/store/apps/details?id=com.spinel.dickens</string>
+    <string name="more_apps_url">https://play.google.com/store/apps/dev?id=7189513262046406321</string>
+
+    <!-- Search Screen -->
+    <string name="search_title">البحث في الروايات</string>
+    <string name="search_hint">ابحث باسم الرواية...</string>
+    <string name="search_empty_title">لا توجد نتائج مطابقة</string>
+    <string name="search_empty_desc">تأكد من كتابة اسم الرواية بشكل صحيح</string>
+    <string name="search_bar_placeholder">اكتب اسم الكتاب هنا...</string>
+    <string name="search_initial_title">اكتب اسم الرواية للبحث</string>
+    <string name="search_initial_desc">يمكنك البحث عن أي رواية في المكتبة باستخدام عنوانها.</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_general_name">إشعارات عامة</string>
+    <string name="notification_channel_general_desc">إشعارات التحديثات والروايات الجديدة</string>
+</resources>

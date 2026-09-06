@@ -1,6 +1,6 @@
 {
-  "name": "تشارلز ديكنز",
-  "description": "تطبيق روايات تشارلز ديكنز بالعربية والإنجليزية مع قارئ مريح وحفظ موضع القراءة ودعم الإعلانات والموافقة UMP",
+  "name": "Charles Dickens Library",
+  "description": "Charles Dickens Library application in English and Arabic with Victorian masterpieces, reader settings, bookmarks, and remote covers",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
