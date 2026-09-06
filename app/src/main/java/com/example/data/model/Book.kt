@@ -1,5 +1,11 @@
 package com.example.data.model
 
+data class BookPart(
+    val id: String,
+    val title: String,
+    val chapterCount: Int = 0
+)
+
 data class Book(
     val id: String,
     val titleAr: String,
@@ -17,7 +23,11 @@ data class Book(
     val isPdf: Boolean = false,
     val pdfUrl: String? = null,
     val samplePdfTitle: String? = null,
-    val totalChapters: Int = 0
+    val totalChapters: Int = 0,
+    val jsonUrl: String? = null,
+    val navType: String = "chapters",
+    val direction: String = "ltr",
+    val parts: List<BookPart> = emptyList()
 )
 
 enum class BookLanguage {

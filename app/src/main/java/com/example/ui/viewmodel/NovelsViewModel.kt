@@ -8,6 +8,7 @@ import com.example.data.local.AppDatabase
 import com.example.data.local.DickensNovelsRepository
 import com.example.data.model.Book
 import com.example.data.model.BookLanguage
+import com.example.data.model.BookPart
 import com.example.data.model.Bookmark
 import com.example.data.model.Chapter
 import com.example.data.model.Quote
@@ -39,6 +40,13 @@ enum class BookFilter {
     ENGLISH_ONLY
 }
 
+sealed class BookContentState {
+    object Idle : BookContentState()
+    object Loading : BookContentState()
+    data class Success(val chapters: List<Chapter>, val parts: List<BookPart> = emptyList()) : BookContentState()
+    data class Error(val message: String) : BookContentState()
+}
+
 data class NovelsUiState(
     val books: List<Book> = emptyList(),
     val filteredBooks: List<Book> = emptyList(),
@@ -55,7 +63,8 @@ data class NovelsUiState(
     val currentChapterIndex: Int = 0,
     val currentScrollOffset: Int = 0,
     val isSyncingServer: Boolean = false,
-    val serverStatusMessage: String? = null
+    val serverStatusMessage: String? = null,
+    val bookContentState: Map<String, BookContentState> = emptyMap()
 )
 
 class NovelsViewModel(application: Application) : AndroidViewModel(application) {
@@ -172,9 +181,70 @@ class NovelsViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+    fun loadBookContent(bookId: String, onComplete: ((Boolean) -> Unit)? = null) {
+        val book = repository.getBookById(bookId) ?: return
+        val existingChapters = repository.getChaptersForBook(bookId)
+        val existingParts = repository.getPartsForBook(bookId)
+        if (existingChapters.isNotEmpty()) {
+            _uiState.value = _uiState.value.copy(
+                bookContentState = _uiState.value.bookContentState + (bookId to BookContentState.Success(existingChapters, existingParts))
+            )
+            onComplete?.invoke(true)
+            return
+        }
+
+        _uiState.value = _uiState.value.copy(
+            bookContentState = _uiState.value.bookContentState + (bookId to BookContentState.Loading)
+        )
+
+        viewModelScope.launch {
+            val result = repository.loadBookContent(book)
+            result.onSuccess { content ->
+                _uiState.value = _uiState.value.copy(
+                    bookContentState = _uiState.value.bookContentState + (bookId to BookContentState.Success(content.chapters, content.parts)),
+                    selectedBook = if (_uiState.value.selectedBook?.id == bookId) {
+                        _uiState.value.selectedBook?.copy(
+                            navType = content.navType,
+                            direction = content.direction,
+                            parts = content.parts,
+                            totalChapters = content.chapters.size
+                        )
+                    } else _uiState.value.selectedBook,
+                    selectedChapter = if (_uiState.value.selectedBook?.id == bookId) {
+                        val idx = _uiState.value.currentChapterIndex.coerceIn(content.chapters.indices)
+                        content.chapters.getOrNull(idx)
+                    } else _uiState.value.selectedChapter
+                )
+                onComplete?.invoke(true)
+            }.onFailure { error ->
+                val msg = error.localizedMessage ?: "Failed to load book content"
+                _uiState.value = _uiState.value.copy(
+                    bookContentState = _uiState.value.bookContentState + (bookId to BookContentState.Error(msg))
+                )
+                onComplete?.invoke(false)
+            }
+        }
+    }
+
+    fun getChaptersForBook(bookId: String): List<Chapter> {
+        val state = _uiState.value.bookContentState[bookId]
+        if (state is BookContentState.Success) {
+            return state.chapters
+        }
+        return repository.getChaptersForBook(bookId)
+    }
+
+    fun getPartsForBook(bookId: String): List<BookPart> {
+        val state = _uiState.value.bookContentState[bookId]
+        if (state is BookContentState.Success) {
+            return state.parts
+        }
+        return repository.getPartsForBook(bookId)
+    }
+
     fun selectBook(bookId: String) {
         val book = repository.getBookById(bookId)
-        val chapters = repository.getChaptersForBook(bookId)
+        val chapters = getChaptersForBook(bookId)
         val progress = _uiState.value.readingProgressMap[bookId]
         val initialChapterIndex = progress?.lastChapterIndex ?: 0
         val initialScroll = progress?.lastScrollOffset ?: 0
@@ -189,11 +259,15 @@ class NovelsViewModel(application: Application) : AndroidViewModel(application) 
             currentChapterIndex = initialChapterIndex,
             currentScrollOffset = initialScroll
         )
+
+        if (chapters.isEmpty() && book != null) {
+            loadBookContent(bookId)
+        }
     }
 
     fun selectChapter(index: Int) {
         val book = _uiState.value.selectedBook ?: return
-        val chapters = repository.getChaptersForBook(book.id)
+        val chapters = getChaptersForBook(book.id)
         if (index in chapters.indices) {
             _uiState.value = _uiState.value.copy(
                 selectedChapter = chapters[index],
@@ -206,7 +280,7 @@ class NovelsViewModel(application: Application) : AndroidViewModel(application) 
 
     fun nextChapter() {
         val book = _uiState.value.selectedBook ?: return
-        val chapters = repository.getChaptersForBook(book.id)
+        val chapters = getChaptersForBook(book.id)
         val next = _uiState.value.currentChapterIndex + 1
         if (next < chapters.size) {
             selectChapter(next)
@@ -222,7 +296,7 @@ class NovelsViewModel(application: Application) : AndroidViewModel(application) 
 
     fun saveReadingPosition(chapterIndex: Int, scrollOffset: Int) {
         val book = _uiState.value.selectedBook ?: return
-        val chapters = repository.getChaptersForBook(book.id)
+        val chapters = getChaptersForBook(book.id)
         val total = chapters.size.coerceAtLeast(1)
         val progressPercent = ((chapterIndex.toFloat() + 0.5f) / total.toFloat()).coerceIn(0f, 1f)
 

@@ -8,5 +8,8 @@ data class Chapter(
     val titleEn: String,
     val contentAr: String,
     val contentEn: String,
-    val isPdfFormatted: Boolean = false
+    val isPdfFormatted: Boolean = false,
+    val tocTitle: String? = null,
+    val partId: String? = null,
+    val partTitle: String? = null
 )

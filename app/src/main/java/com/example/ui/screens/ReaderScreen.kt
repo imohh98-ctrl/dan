@@ -75,6 +75,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.R
 import com.example.data.model.Book
+import com.example.data.model.BookLanguage
 import com.example.data.model.Chapter
 import com.example.data.model.ReaderThemeMode
 import com.example.data.model.ReadingSettings
@@ -122,9 +123,21 @@ fun ReaderScreen(
 ) {
     val context = LocalContext.current
     val isArabic = currentLanguage == AppLanguage.ARABIC
-    val chapterTitle = if (isArabic) chapter.titleAr else chapter.titleEn
-    val bookTitle = if (isArabic) book.titleAr else book.titleEn
-    val textContent = if (isArabic) chapter.contentAr else chapter.contentEn
+    val isBookRtl = book.language == BookLanguage.ARABIC ||
+            book.direction.equals("rtl", ignoreCase = true) ||
+            book.id.endsWith("-ar")
+    val textDirection = if (isBookRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
+    val chapterTitle = if (isBookRtl) {
+        (chapter.tocTitle?.ifBlank { null } ?: chapter.titleAr).ifBlank { chapter.titleEn }
+    } else {
+        (chapter.tocTitle?.ifBlank { null } ?: chapter.titleEn).ifBlank { chapter.titleAr }
+    }
+    val bookTitle = if (isBookRtl) book.titleAr.ifBlank { book.titleEn } else book.titleEn.ifBlank { book.titleAr }
+    val textContent = if (isBookRtl) {
+        chapter.contentAr.ifBlank { chapter.contentEn }
+    } else {
+        chapter.contentEn.ifBlank { chapter.contentAr }
+    }
 
     // Palette Resolution
     val (readerBg, readerTextColor) = when (readingSettings.themeMode) {
@@ -165,9 +178,6 @@ fun ReaderScreen(
             }
         }
     }
-
-    // Determine layout direction for text reading
-    val textDirection = if (isArabic) LayoutDirection.Rtl else LayoutDirection.Ltr
 
     Scaffold(
         modifier = modifier
@@ -502,6 +512,7 @@ fun ReaderScreen(
     // Modal Sheet for Chapter selection
     if (showChaptersSheet) {
         ChaptersBottomSheet(
+            book = book,
             chapters = allChapters,
             currentChapterIndex = currentChapterIndex,
             currentLanguage = currentLanguage,

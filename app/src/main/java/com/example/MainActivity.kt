@@ -14,12 +14,18 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import com.example.notifications.DickensFirebaseMessagingService
 import com.example.util.SafeIntentHelper
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -34,6 +40,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -46,8 +53,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.compose.ui.unit.dp
 import com.example.ads.AdManager
 import com.example.ads.UmpConsentManager
+import com.example.data.model.BookLanguage
 import com.example.ui.screens.BookDetailScreen
 import com.example.ui.screens.BookmarksScreen
 import com.example.ui.screens.HomeScreen
@@ -55,6 +64,7 @@ import com.example.ui.screens.ReaderScreen
 import com.example.ui.screens.SearchScreen
 import com.example.ui.screens.SettingsScreen
 import com.example.ui.theme.CharlesDickensTheme
+import com.example.ui.viewmodel.BookContentState
 import com.example.ui.viewmodel.NovelsViewModel
 
 object NavRoutes {
@@ -337,13 +347,24 @@ fun AppNavigation(
             ) { backStackEntry ->
                 val bookId = backStackEntry.arguments?.getString("bookId") ?: ""
                 val book = viewModel.repository.getBookById(bookId)
-                val chapters = viewModel.repository.getChaptersForBook(bookId)
+                val chapters = viewModel.getChaptersForBook(bookId)
+                val parts = viewModel.getPartsForBook(bookId)
+                val contentState = uiState.bookContentState[bookId]
                 val progress = uiState.readingProgressMap[bookId]
+
+                LaunchedEffect(bookId) {
+                    if (chapters.isEmpty()) {
+                        viewModel.loadBookContent(bookId)
+                    }
+                }
 
                 if (book != null) {
                     BookDetailScreen(
                         book = book,
                         chapters = chapters,
+                        parts = parts,
+                        contentState = contentState,
+                        onRetryLoadContent = { viewModel.loadBookContent(bookId) },
                         progress = progress,
                         currentLanguage = uiState.currentLanguage,
                         onBack = { navController.popBackStack() },
@@ -377,7 +398,15 @@ fun AppNavigation(
                 val chapterIdx = backStackEntry.arguments?.getInt("chapterIndex") ?: 0
 
                 val book = viewModel.repository.getBookById(bookId)
-                val chapters = viewModel.repository.getChaptersForBook(bookId)
+                val chapters = viewModel.getChaptersForBook(bookId)
+                val contentState = uiState.bookContentState[bookId]
+
+                LaunchedEffect(bookId) {
+                    if (chapters.isEmpty()) {
+                        viewModel.loadBookContent(bookId)
+                    }
+                }
+
                 val currentChapter = if (chapterIdx in chapters.indices) chapters[chapterIdx] else chapters.firstOrNull()
                 val progress = uiState.readingProgressMap[bookId]
                 val initialScroll = progress?.lastScrollOffset ?: 0
@@ -430,6 +459,36 @@ fun AppNavigation(
                         onToggleDistractionFree = { viewModel.toggleDistractionFree() },
                         onZoomScaleChange = { viewModel.updateContentZoom(it) }
                     )
+                } else if (book != null) {
+                    val isBookRtl = book.language == BookLanguage.ARABIC ||
+                            book.direction.equals("rtl", ignoreCase = true) ||
+                            book.id.endsWith("-ar")
+                    Surface(modifier = Modifier.fillMaxSize()) {
+                        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                            if (contentState is BookContentState.Error) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(24.dp)) {
+                                    Text(
+                                        text = if (isBookRtl) "تعذر تحميل فصول الكتاب: ${contentState.message}" else "Failed to load chapters: ${contentState.message}",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Button(onClick = { viewModel.loadBookContent(bookId) }) {
+                                        Text(if (isBookRtl) "إعادة المحاولة" else "Retry")
+                                    }
+                                }
+                            } else {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    CircularProgressIndicator()
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Text(
+                                        text = if (isBookRtl) "جارٍ تحميل محتوى الكتاب..." else "Loading book content...",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
 

@@ -3,14 +3,18 @@ package com.example.data.local
 import android.content.Context
 import com.example.data.model.Book
 import com.example.data.model.BookLanguage
+import com.example.data.model.BookPart
 import com.example.data.model.Bookmark
 import com.example.data.model.Chapter
 import com.example.data.model.Quote
 import com.example.data.model.ReadingProgress
+import com.example.data.remote.BookContentResult
+import com.example.data.remote.BookLoader
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.Random
+import java.util.concurrent.ConcurrentHashMap
 
 class DickensNovelsRepository(
     private val database: AppDatabase,
@@ -19,7 +23,11 @@ class DickensNovelsRepository(
     private val bookmarkDao = database.bookmarkDao()
     private val readingProgressDao = database.readingProgressDao()
 
-    private val _books = MutableStateFlow<List<Book>>(emptyList())
+    private val bookLoader = BookLoader(context)
+    private val _chaptersCache = ConcurrentHashMap<String, List<Chapter>>()
+    private val _partsCache = ConcurrentHashMap<String, List<BookPart>>()
+
+    private val _books = MutableStateFlow<List<Book>>(DickensCatalog.ALL_BOOKS)
     val books: Flow<List<Book>> = _books.asStateFlow()
 
     fun clearBooks() {
@@ -27,7 +35,45 @@ class DickensNovelsRepository(
     }
 
     fun loadDefaultNovels() {
-        _books.value = defaultNovels
+        _books.value = DickensCatalog.ALL_BOOKS
+    }
+
+    suspend fun loadBookContent(book: Book): Result<BookContentResult> {
+        val cachedChaps = _chaptersCache[book.id]
+        if (!cachedChaps.isNullOrEmpty()) {
+            val cachedParts = _partsCache[book.id] ?: emptyList()
+            return Result.success(
+                BookContentResult(
+                    bookId = book.id,
+                    navType = book.navType,
+                    direction = book.direction,
+                    parts = cachedParts,
+                    chapters = cachedChaps
+                )
+            )
+        }
+
+        val res = bookLoader.loadBookContent(book)
+        res.onSuccess { content ->
+            _chaptersCache[book.id] = content.chapters
+            _partsCache[book.id] = content.parts
+            val current = _books.value.toMutableList()
+            val idx = current.indexOfFirst { it.id == book.id }
+            if (idx >= 0) {
+                current[idx] = current[idx].copy(
+                    navType = content.navType,
+                    direction = content.direction,
+                    parts = content.parts,
+                    totalChapters = content.chapters.size
+                )
+                _books.value = current
+            }
+        }
+        return res
+    }
+
+    fun getPartsForBook(bookId: String): List<BookPart> {
+        return _partsCache[bookId] ?: emptyList()
     }
 
     private val _customServerUrl = MutableStateFlow("https://my-dickens-server.example.com/api/novels")
@@ -62,11 +108,11 @@ class DickensNovelsRepository(
         bookmarkDao.deleteBookmarkForChapter(bookId, chapterIndex)
 
     fun getBookById(id: String): Book? {
-        return _books.value.find { it.id == id } ?: defaultNovels.find { it.id == id }
+        return _books.value.find { it.id == id } ?: DickensCatalog.ALL_BOOKS.find { it.id == id }
     }
 
     fun getChaptersForBook(bookId: String): List<Chapter> {
-        return novelsChapters[bookId] ?: emptyList()
+        return _chaptersCache[bookId] ?: novelsChapters[bookId] ?: emptyList()
     }
 
     fun getRandomQuote(): Quote {
@@ -98,87 +144,7 @@ class DickensNovelsRepository(
     }
 
     companion object {
-        val defaultNovels = listOf(
-            Book(
-                id = "tale_two_cities",
-                titleAr = "قصة مدينتين",
-                titleEn = "A Tale of Two Cities",
-                descAr = "إحدى أشهر روايات الأدب العالمي، تدور أحداثها بين لندن وباريس إبان الثورة الفرنسية، مجسدة التضحية والفداء والولادة الجديدة من خلال شخصيات تشارلز دارني وسيدني كارتون.",
-                descEn = "Set in London and Paris before and during the French Revolution, this epic tale of passion, sacrifice, and redemption depicts the harrowing contrast between the two cities.",
-                year = 1859,
-                genreAr = "رواية تاريخية كلاسيكية",
-                genreEn = "Historical Classic",
-                language = BookLanguage.BILINGUAL,
-                isPdf = false,
-                totalChapters = 5
-            ),
-            Book(
-                id = "great_expectations",
-                titleAr = "آمال عظيمة",
-                titleEn = "Great Expectations",
-                descAr = "سيرة حياة الصبي اليتيم بيب وتطلعاته للطبقة الراقية بفضل محسن غامض، ورغبته في كسب قلب إستيلا في قصر الآنسة هافيشام المهيب المتجمد في الزمن.",
-                descEn = "The journey of orphan Pip as he navigates mysterious fortunes, social ambition, and true love amidst the haunting ruins of Miss Havisham's mansion.",
-                year = 1861,
-                genreAr = "رواية بناء الذات وتطور الشخصية",
-                genreEn = "Coming-of-Age Classic",
-                language = BookLanguage.BILINGUAL,
-                isPdf = false,
-                totalChapters = 5
-            ),
-            Book(
-                id = "oliver_twist",
-                titleAr = "أوليفر تويست",
-                titleEn = "Oliver Twist",
-                descAr = "القصة الخالدة للصبي اليتيم الشجاع الذي يهرب من ملجأ بائس في لندن ليقع في يد عصابة فاغين ولصوص الشوارع، قبل أن يجد النور والعدالة بفضل أصحاب القلوب الرحيمة.",
-                descEn = "The moving chronicle of an innocent orphan struggling to survive the grim workhouses and London underbelly before discovering his rightful identity.",
-                year = 1838,
-                genreAr = "رواية اجتماعية واقعية",
-                genreEn = "Social Realism",
-                language = BookLanguage.BILINGUAL,
-                isPdf = false,
-                totalChapters = 5
-            ),
-            Book(
-                id = "christmas_carol",
-                titleAr = "ترنيمة عيد الميلاد",
-                titleEn = "A Christmas Carol",
-                descAr = "التحفة الشتوية المحبوبة عن البخيل القاسي إبينيزر سكروج الذي تتبدل روحه بالكامل بعد زيارة أشباح الماضي والحاضر والمستقبل في ليلة الميلاد.",
-                descEn = "The transformative journey of Ebenezer Scrooge, visited by the ghosts of Christmas Past, Present, and Yet to Come to rediscover compassion.",
-                year = 1843,
-                genreAr = "حكاية رمزية إنسانية",
-                genreEn = "Literary Allegory",
-                language = BookLanguage.BILINGUAL,
-                isPdf = false,
-                totalChapters = 4
-            ),
-            Book(
-                id = "david_copperfield",
-                titleAr = "ديفيد كوبرفيلد",
-                titleEn = "David Copperfield",
-                descAr = "الرواية الأقرب لقلب تشارلز ديكنز والتي استوحاها من سيرة حياته الذاتية، زاخرة بالشخصيات الاستثنائية مثل ميكاوبر وبوغوتي وأوريا هيب.",
-                descEn = "Dickens' favorite personal work tracing David's journey from an impoverished youth to an accomplished author amidst Victorian society.",
-                year = 1850,
-                genreAr = "سيرة روائية ملحمية",
-                genreEn = "Autobiographical Fiction",
-                language = BookLanguage.BILINGUAL,
-                isPdf = false,
-                totalChapters = 4
-            ),
-            Book(
-                id = "hard_times",
-                titleAr = "أوقات عصيبة",
-                titleEn = "Hard Times",
-                descAr = "نقد لاذع للمادية الصارمة في خضم الثورة الصناعية بمدينة كوك تاون، حيث يقيس المستر غرادغرايند كل شيء بالأرقام والحقائق المجردة ويتجاهل المشاعر والخيال.",
-                descEn = "A sharp critique of utilitarianism and industrial smoke in Coketown, examining the vital clash between cold calculation and human empathy.",
-                year = 1854,
-                genreAr = "دراما اجتماعية فلسفية",
-                genreEn = "Philosophical Drama",
-                language = BookLanguage.BILINGUAL,
-                isPdf = true, // marks sample Arabic enhanced zoom reading
-                samplePdfTitle = "مخطوطة أوقات عصيبة - النسخة التراثية الموسعة",
-                totalChapters = 3
-            )
-        )
+        val defaultNovels = DickensCatalog.ALL_BOOKS
 
         val dickensQuotes = listOf(
             Quote(
