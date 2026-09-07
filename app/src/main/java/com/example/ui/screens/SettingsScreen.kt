@@ -266,7 +266,7 @@ fun SettingsScreen(
                                     umpConsentManager.showPrivacyOptionsForm(context) {
                                         Toast.makeText(
                                             context,
-                                            if (isArabic) "تم تحديث خيارات الموافقة" else "Privacy options updated",
+                                            context.getString(R.string.privacy_updated),
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     }
@@ -294,7 +294,7 @@ fun SettingsScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = if (isArabic) "مشاركة ومزيد من التطبيقات" else "Share & Explore",
+                        text = stringResource(id = R.string.share_explore_title),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold
                     )

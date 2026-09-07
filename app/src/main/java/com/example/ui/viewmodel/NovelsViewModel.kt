@@ -1,6 +1,7 @@
 package com.example.ui.viewmodel
 
 import android.app.Application
+import android.content.Context
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -52,7 +53,7 @@ data class NovelsUiState(
     val filteredBooks: List<Book> = emptyList(),
     val activeFilter: BookFilter = BookFilter.ALL,
     val searchQuery: String = "",
-    val currentLanguage: AppLanguage = AppLanguage.ARABIC,
+    val currentLanguage: AppLanguage = AppLanguage.ENGLISH,
     val appThemeMode: AppThemeMode = AppThemeMode.SYSTEM,
     val activeQuote: Quote = DickensNovelsRepository.dickensQuotes.first(),
     val readingProgressMap: Map<String, ReadingProgress> = emptyMap(),
@@ -72,18 +73,46 @@ class NovelsViewModel(application: Application) : AndroidViewModel(application) 
     private val database = AppDatabase.getInstance(application)
     val repository = DickensNovelsRepository(database, application)
 
-    // Detect system language as default
+    private val prefs = application.getSharedPreferences("dickens_library_settings", Context.MODE_PRIVATE)
+
+    // Detect system language as default, but prioritize saved user selection
     private val systemDefaultLanguage: AppLanguage = run {
         val systemLocale = application.resources.configuration.locales.get(0)
         if (systemLocale.language.startsWith("ar")) AppLanguage.ARABIC else AppLanguage.ENGLISH
+    }
+
+    private val initialLanguage: AppLanguage = run {
+        val saved = prefs.getString("selected_language", null)
+        if (saved != null) {
+            try {
+                AppLanguage.valueOf(saved)
+            } catch (e: Exception) {
+                systemDefaultLanguage
+            }
+        } else {
+            systemDefaultLanguage
+        }
+    }
+
+    private val initialThemeMode: AppThemeMode = run {
+        val saved = prefs.getString("selected_theme", null)
+        if (saved != null) {
+            try {
+                AppThemeMode.valueOf(saved)
+            } catch (e: Exception) {
+                AppThemeMode.SYSTEM
+            }
+        } else {
+            AppThemeMode.SYSTEM
+        }
     }
 
     private val _uiState = MutableStateFlow(
         NovelsUiState(
             books = emptyList(),
             filteredBooks = emptyList(),
-            currentLanguage = systemDefaultLanguage,
-            appThemeMode = AppThemeMode.SYSTEM,
+            currentLanguage = initialLanguage,
+            appThemeMode = initialThemeMode,
             activeQuote = repository.getRandomQuote()
         )
     )
@@ -126,6 +155,7 @@ class NovelsViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun setLanguage(language: AppLanguage) {
+        prefs.edit().putString("selected_language", language.name).apply()
         _uiState.value = _uiState.value.copy(
             currentLanguage = language,
             filteredBooks = applyFilters(_uiState.value.books, language, _uiState.value.searchQuery)
@@ -138,6 +168,7 @@ class NovelsViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun setAppThemeMode(themeMode: AppThemeMode) {
+        prefs.edit().putString("selected_theme", themeMode.name).apply()
         _uiState.value = _uiState.value.copy(appThemeMode = themeMode)
     }
 
@@ -160,16 +191,15 @@ class NovelsViewModel(application: Application) : AndroidViewModel(application) 
 
     /**
      * Filters books based on:
-     * 1. App language:
-     *    - ARABIC language: Show Arabic novels (ARABIC or BILINGUAL)
-     *    - ENGLISH language: Show English novels (ENGLISH or BILINGUAL)
-     * 2. Search query: Matches ONLY the book title (as requested: "البحث يبحث عن اسم الكتاب وليس عن نص داخل الكتب")
+     * 1. Active filter (All / Arabic / English)
+     * 2. Search query: Matches ONLY the book title
      */
     private fun applyFilters(books: List<Book>, language: AppLanguage, query: String): List<Book> {
         return books.filter { book ->
-            val matchesLanguage = when (language) {
-                AppLanguage.ARABIC -> book.language == BookLanguage.ARABIC || book.language == BookLanguage.BILINGUAL
-                AppLanguage.ENGLISH -> book.language == BookLanguage.ENGLISH || book.language == BookLanguage.BILINGUAL
+            val matchesFilter = when (_uiState.value.activeFilter) {
+                BookFilter.ALL -> true
+                BookFilter.ARABIC_ONLY -> book.language == BookLanguage.ARABIC || book.language == BookLanguage.BILINGUAL
+                BookFilter.ENGLISH_ONLY -> book.language == BookLanguage.ENGLISH || book.language == BookLanguage.BILINGUAL
             }
             val matchesTitleOnly = if (query.isBlank()) {
                 true
@@ -177,7 +207,7 @@ class NovelsViewModel(application: Application) : AndroidViewModel(application) 
                 book.titleAr.contains(query, ignoreCase = true) ||
                         book.titleEn.contains(query, ignoreCase = true)
             }
-            matchesLanguage && matchesTitleOnly
+            matchesFilter && matchesTitleOnly
         }
     }
 

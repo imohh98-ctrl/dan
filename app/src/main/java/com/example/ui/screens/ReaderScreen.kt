@@ -217,7 +217,7 @@ fun ReaderScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back",
+                                contentDescription = stringResource(id = R.string.btn_back),
                                 tint = readerTextColor
                             )
                         }
@@ -237,7 +237,7 @@ fun ReaderScreen(
                         ) {
                             Icon(
                                 imageVector = if (isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                                contentDescription = "Bookmark",
+                                contentDescription = stringResource(id = R.string.screen_bookmarks),
                                 tint = if (isBookmarked) MaterialTheme.colorScheme.secondary else readerTextColor
                             )
                         }
@@ -247,7 +247,7 @@ fun ReaderScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.FormatListBulleted,
-                                contentDescription = "Chapters",
+                                contentDescription = stringResource(id = R.string.screen_chapters),
                                 tint = readerTextColor
                             )
                         }
@@ -257,7 +257,7 @@ fun ReaderScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Tune,
-                                contentDescription = "Reading Settings",
+                                contentDescription = stringResource(id = R.string.reader_settings_title),
                                 tint = readerTextColor
                             )
                         }
@@ -267,7 +267,7 @@ fun ReaderScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Fullscreen,
-                                contentDescription = "Distraction-Free Mode",
+                                contentDescription = stringResource(id = R.string.reader_distraction_free),
                                 tint = readerTextColor
                             )
                         }
@@ -429,7 +429,7 @@ fun ReaderScreen(
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = if (isArabic) "الفصل السابق" else "Previous Chapter",
+                            text = stringResource(id = R.string.btn_prev_chapter),
                             style = MaterialTheme.typography.labelSmall
                         )
                     }
@@ -447,7 +447,7 @@ fun ReaderScreen(
                         modifier = Modifier.testTag("next_chapter_button")
                     ) {
                         Text(
-                            text = if (isArabic) "الفصل التالي" else "Next Chapter",
+                            text = stringResource(id = R.string.btn_next_chapter),
                             style = MaterialTheme.typography.labelSmall
                         )
                         Spacer(modifier = Modifier.width(6.dp))
@@ -483,7 +483,7 @@ fun ReaderScreen(
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = if (isArabic) "التمرير التلقائي نشط (${readingSettings.autoScrollSpeed}x)" else "Auto-scroll active (${readingSettings.autoScrollSpeed}x)",
+                            text = stringResource(id = R.string.auto_scroll_enabled, readingSettings.autoScrollSpeed),
                             color = Color.White,
                             style = MaterialTheme.typography.labelSmall
                         )

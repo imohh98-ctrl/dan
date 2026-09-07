@@ -1,6 +1,5 @@
 package com.example.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -8,6 +7,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15,9 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoStories
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -33,15 +31,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.R
 import com.example.data.model.Book
-import com.example.data.model.BookLanguage
 import com.example.data.model.ReadingProgress
 import com.example.ui.viewmodel.AppLanguage
 
@@ -53,71 +52,75 @@ fun BookCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isArabic = currentLanguage == AppLanguage.ARABIC
-    val title = if (isArabic) book.titleAr else book.titleEn
-    val author = if (isArabic) book.authorAr else book.authorEn
-    val genre = if (isArabic) book.genreAr else book.genreEn
-    val desc = if (isArabic) book.descAr else book.descEn
+    val context = LocalContext.current
+    val isAppArabic = currentLanguage == AppLanguage.ARABIC
+    val primaryTitle = book.titleAr.ifBlank { book.titleEn }
+    val secondaryTitle = if (!isAppArabic && book.titleEn.isNotBlank() && book.titleEn != primaryTitle) book.titleEn else null
+    val author = if (isAppArabic) book.authorAr else book.authorEn
 
     Card(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .testTag("book_card_${book.id}"),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.fillMaxWidth()
         ) {
-            // Book Cover Art / Spine
+            // Book Cover loaded from Server URL
             Box(
                 modifier = Modifier
-                    .width(82.dp)
-                    .height(118.dp)
-                    .clip(RoundedCornerShape(10.dp))
+                    .fillMaxWidth()
+                    .aspectRatio(0.72f) // Standard portrait book aspect ratio (~1:1.39)
+                    .clip(RoundedCornerShape(topStart = 14.dp, topEnd = 14.dp))
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(
-                                MaterialTheme.colorScheme.primaryContainer,
-                                MaterialTheme.colorScheme.primary
+                                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f),
+                                MaterialTheme.colorScheme.surfaceVariant
                             )
                         )
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                // Background artistic icon
-                Image(
-                    painter = painterResource(id = R.drawable.img_app_icon),
-                    contentDescription = title,
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(book.coverUrl)
+                        .crossfade(true)
+                        .placeholder(R.drawable.img_app_icon)
+                        .error(R.drawable.img_app_icon)
+                        .build(),
+                    contentDescription = primaryTitle,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.matchParentSize()
+                    modifier = Modifier.fillMaxSize()
                 )
 
-                // Dark vignette gradient for contrast
+                // Subtle bottom vignette for elegant contrast
                 Box(
                     modifier = Modifier
-                        .matchParentSize()
+                        .fillMaxWidth()
+                        .height(36.dp)
+                        .align(Alignment.BottomCenter)
                         .background(
                             Brush.verticalGradient(
-                                colors = listOf(Color.Transparent, Color(0x99000000))
+                                colors = listOf(Color.Transparent, Color(0x66000000))
                             )
                         )
                 )
 
+                // PDF Tag if book is PDF
                 if (book.isPdf) {
                     Surface(
-                        color = Color(0xCCB71C1C),
+                        color = Color(0xDD1B5E20),
                         shape = RoundedCornerShape(4.dp),
                         modifier = Modifier
                             .align(Alignment.TopEnd)
-                            .padding(4.dp)
+                            .padding(6.dp)
                     ) {
                         Row(
                             modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
@@ -125,7 +128,7 @@ fun BookCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.PictureAsPdf,
-                                contentDescription = "PDF Document",
+                                contentDescription = "PDF",
                                 tint = Color.White,
                                 modifier = Modifier.size(10.dp)
                             )
@@ -141,104 +144,87 @@ fun BookCard(
                 }
             }
 
-            Spacer(modifier = Modifier.width(14.dp))
-
+            // Book Details Section
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp, vertical = 8.dp)
             ) {
+                // Arabic Title (Primary & Authentic)
+                Text(
+                    text = primaryTitle,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    lineHeight = 18.sp
+                )
+
+                // English Title subtitle (when English UI is selected)
+                if (secondaryTitle != null) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = secondaryTitle,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontSize = 11.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Author & Year Row
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = genre,
+                        text = author,
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.secondary,
-                        fontWeight = FontWeight.SemiBold
+                        color = MaterialTheme.colorScheme.primary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontSize = 11.sp,
+                        modifier = Modifier.weight(1f, fill = false)
                     )
+
+                    Spacer(modifier = Modifier.width(4.dp))
+
                     Text(
                         text = "${book.year}",
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 10.sp
                     )
                 }
 
-                Spacer(modifier = Modifier.height(3.dp))
-
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Text(
-                    text = author,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = desc,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    lineHeight = 16.sp
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Progress indicator or Chapter count
+                // Reading Progress bar if started
                 if (progress != null && progress.completionPercent > 0) {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = if (isArabic) "الفصل ${progress.lastChapterIndex + 1}" else "Chapter ${progress.lastChapterIndex + 1}",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.Medium
-                            )
-                            Text(
-                                text = "${(progress.completionPercent * 100).toInt()}%",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         LinearProgressIndicator(
                             progress = { progress.completionPercent },
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .weight(1f)
                                 .height(4.dp)
                                 .clip(RoundedCornerShape(2.dp)),
-                            color = MaterialTheme.colorScheme.primary,
-                            trackColor = MaterialTheme.colorScheme.surfaceVariant
+                            color = MaterialTheme.colorScheme.secondary,
+                            trackColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
                         )
-                    }
-                } else {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.AutoStories,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(13.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = if (isArabic) "${book.totalChapters} فصول كاملة" else "${book.totalChapters} Full Chapters",
+                            text = "${(progress.completionPercent * 100).toInt()}%",
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            fontSize = 10.sp,
+                            color = MaterialTheme.colorScheme.secondary,
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 }

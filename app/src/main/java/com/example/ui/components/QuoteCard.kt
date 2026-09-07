@@ -151,7 +151,7 @@ fun QuoteCard(
 
                 FilledTonalButton(
                     onClick = {
-                        val shareMessage = "“$quoteText”\n— تشارلز ديكنز ($sourceNovel)\n\nتمت المشاركة من تطبيق روايات تشارلز ديكنز"
+                        val shareMessage = context.getString(R.string.quote_share_format, quoteText, sourceNovel)
                         SafeIntentHelper.shareText(context, shareMessage, context.getString(R.string.btn_share_quote))
                     },
                     shape = RoundedCornerShape(10.dp),

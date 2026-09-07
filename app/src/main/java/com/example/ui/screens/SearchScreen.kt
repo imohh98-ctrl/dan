@@ -11,8 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -50,8 +51,6 @@ fun SearchScreen(
     onSearchChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isArabic = uiState.currentLanguage == AppLanguage.ARABIC
-
     Scaffold(
         modifier = modifier
             .fillMaxSize()
@@ -107,7 +106,7 @@ fun SearchScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Clear,
-                                contentDescription = "Clear Search",
+                                contentDescription = stringResource(id = R.string.search_clear_desc),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -125,7 +124,7 @@ fun SearchScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Search Results List
+            // Search Results Grid
             if (uiState.filteredBooks.isEmpty()) {
                 Box(
                     modifier = Modifier
@@ -156,7 +155,7 @@ fun SearchScreen(
                             Spacer(modifier = Modifier.height(14.dp))
                             Text(
                                 text = if (uiState.searchQuery.isBlank()) {
-                                    if (isArabic) "اكتب اسم الرواية للبحث" else "Type novel title to search"
+                                    stringResource(id = R.string.search_initial_title)
                                 } else {
                                     stringResource(id = R.string.search_empty_title)
                                 },
@@ -167,10 +166,7 @@ fun SearchScreen(
                             Spacer(modifier = Modifier.height(6.dp))
                             Text(
                                 text = if (uiState.searchQuery.isBlank()) {
-                                    if (isArabic)
-                                        "يمكنك البحث عن أي رواية في المكتبة باستخدام عنوانها."
-                                    else
-                                        "You can search for any novel in the library using its title."
+                                    stringResource(id = R.string.search_initial_desc)
                                 } else {
                                     stringResource(id = R.string.search_empty_desc)
                                 },
@@ -182,9 +178,12 @@ fun SearchScreen(
                     }
                 }
             } else {
-                LazyColumn(
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = 24.dp)
+                    contentPadding = PaddingValues(bottom = 24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
                     items(uiState.filteredBooks, key = { it.id }) { book ->
                         val progress = uiState.readingProgressMap[book.id]
@@ -193,7 +192,7 @@ fun SearchScreen(
                             progress = progress,
                             currentLanguage = uiState.currentLanguage,
                             onClick = { onBookClick(book.id) },
-                            modifier = Modifier.padding(bottom = 12.dp)
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }

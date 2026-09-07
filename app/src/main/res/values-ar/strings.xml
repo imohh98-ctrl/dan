@@ -16,11 +16,37 @@
     <!-- Hero & Quotes -->
     <string name="hero_title">مكتبة تشارلز ديكنز الخالدة</string>
     <string name="hero_subtitle">رحلة في أعماق لندن وباريس مع روائع الأدب العالمي</string>
+    <string name="hero_banner_title">مكتبة تشارلز ديكنز الخالدة</string>
+    <string name="hero_banner_subtitle">رحلة في أعماق لندن وباريس مع روائع الأدب العالمي</string>
+    <string name="btn_back">رجوع</string>
+    <string name="share_app">مشاركة التطبيق</string>
+    <string name="dialog_remove">حذف</string>
+    <string name="screen_chapters">فصول الرواية</string>
+    <string name="btn_prev_chapter">الفصل السابق</string>
+    <string name="btn_next_chapter">الفصل التالي</string>
     <string name="section_quote_title">اقتباس اليوم من تشارلز ديكنز</string>
     <string name="btn_share_quote">مشاركة الاقتباس</string>
     <string name="quote_share_format">“%1$s”\n— تشارلز ديكنز (%2$s)\n\nتمت المشاركة من تطبيق Charles Dickens Library</string>
 
     <!-- Home Empty State & Actions -->
+    <string name="home_section_classics">روائع تشارلز ديكنز</string>
+    <string name="home_books_count">%1$d رواية</string>
+    <string name="search_clear_desc">مسح البحث</string>
+    <string name="reader_font_smaller">تصغير الخط</string>
+    <string name="reader_font_larger">تكبير الخط</string>
+    <string name="reader_zoom_out">تصغير الصفحة</string>
+    <string name="reader_zoom_in">تكبير الصفحة</string>
+    <string name="detail_about_novel">نبذة عن الرواية</string>
+    <string name="detail_arabic_text">النص باللغة العربية</string>
+    <string name="detail_english_text">النص باللغة الإنجليزية</string>
+    <string name="detail_unit_stories">قصة</string>
+    <string name="detail_unit_chapters">فصلاً</string>
+    <string name="detail_section_chapters">قائمة الفصول</string>
+    <string name="detail_section_stories">قائمة القصص</string>
+    <string name="detail_section_parts">الأجزاء والفصول</string>
+    <string name="detail_continue_reading_format">متابعة القراءة (%1$d)</string>
+    <string name="detail_share_recommend">أنصحك بقراءة رواية \"%1$s\" للأديب العالمي تشارلز ديكنز!\nحمل التطبيق واستمتع بأعظم الروايات العالمية.</string>
+
     <string name="empty_library_title">لا توجد روايات في المكتبة حالياً</string>
     <string name="empty_library_desc">المكتبة فارغة حالياً بدون أي روايات. يمكنك تحديث الروايات متى شئت عبر الإعدادات.</string>
 

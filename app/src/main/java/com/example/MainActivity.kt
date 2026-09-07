@@ -4,8 +4,10 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
+import java.util.Locale
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -42,10 +44,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.LayoutDirection
+import com.example.ui.viewmodel.AppLanguage
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -115,8 +120,36 @@ class MainActivity : ComponentActivity() {
         setContent {
             val uiState by viewModel.uiState.collectAsState()
 
-            CharlesDickensTheme(appThemeMode = uiState.appThemeMode) {
-                CompositionLocalProvider(LocalLayoutDirection provides viewModel.layoutDirection) {
+            val targetLocale = remember(uiState.currentLanguage) {
+                if (uiState.currentLanguage == AppLanguage.ARABIC) Locale("ar") else Locale("en")
+            }
+            val baseContext = LocalContext.current
+            val localizedContext = remember(baseContext, targetLocale) {
+                val config = Configuration(baseContext.resources.configuration).apply {
+                    setLocale(targetLocale)
+                    setLayoutDirection(targetLocale)
+                }
+                baseContext.createConfigurationContext(config)
+            }
+            val baseConfiguration = LocalConfiguration.current
+            val localizedConfiguration = remember(baseConfiguration, targetLocale) {
+                Configuration(baseConfiguration).apply {
+                    setLocale(targetLocale)
+                    setLayoutDirection(targetLocale)
+                }
+            }
+            val layoutDir = if (uiState.currentLanguage == AppLanguage.ARABIC) {
+                LayoutDirection.Rtl
+            } else {
+                LayoutDirection.Ltr
+            }
+
+            CompositionLocalProvider(
+                LocalConfiguration provides localizedConfiguration,
+                LocalContext provides localizedContext,
+                LocalLayoutDirection provides layoutDir
+            ) {
+                CharlesDickensTheme(appThemeMode = uiState.appThemeMode) {
                     Surface(modifier = Modifier.fillMaxSize()) {
                         AppNavigation(
                             viewModel = viewModel,

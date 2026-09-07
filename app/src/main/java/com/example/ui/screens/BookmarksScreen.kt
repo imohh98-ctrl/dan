@@ -69,7 +69,7 @@ fun BookmarksScreen(
                     IconButton(onClick = onBack, modifier = Modifier.testTag("bookmarks_back_btn")) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(id = R.string.btn_back)
                         )
                     }
                 },
@@ -166,7 +166,7 @@ fun BookmarksScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Delete,
-                                    contentDescription = "Delete",
+                                    contentDescription = stringResource(id = R.string.dialog_remove),
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                                 )
                             }

@@ -108,9 +108,11 @@ fun BookDetailScreen(
         map
     }
 
-    val layoutDirection = if (isBookRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
+    val isAppArabic = currentLanguage == AppLanguage.ARABIC
+    val uiDirection = if (isAppArabic) LayoutDirection.Rtl else LayoutDirection.Ltr
+    val bookDirection = if (isBookRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
 
-    CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
+    CompositionLocalProvider(LocalLayoutDirection provides uiDirection) {
         Scaffold(
             modifier = modifier
                 .fillMaxSize()
@@ -122,23 +124,19 @@ fun BookDetailScreen(
                         IconButton(onClick = onBack, modifier = Modifier.testTag("detail_back_button")) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back"
+                                contentDescription = stringResource(id = R.string.btn_back)
                             )
                         }
                     },
                     actions = {
                         IconButton(
                             onClick = {
-                                val msg = if (isBookRtl) {
-                                    "أنصحك بقراءة رواية \"$title\" للأديب العالمي تشارلز ديكنز!\nحمل التطبيق واستمتع بأعظم الروايات العالمية."
-                                } else {
-                                    "I recommend reading \"$title\" by Charles Dickens!\nDownload the app to explore the complete library."
-                                }
+                                val msg = context.getString(R.string.detail_share_recommend, title)
                                 SafeIntentHelper.shareText(context, msg, title)
                             },
                             modifier = Modifier.testTag("share_book_button")
                         ) {
-                            Icon(imageVector = Icons.Default.Share, contentDescription = "Share")
+                            Icon(imageVector = Icons.Default.Share, contentDescription = stringResource(id = R.string.share_app))
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
@@ -252,9 +250,10 @@ fun BookDetailScreen(
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     val countDisplay = if (chapters.isNotEmpty()) chapters.size else book.totalChapters
-                                    val countUnit = when {
-                                        isStories -> if (isBookRtl) "قصة" else "stories"
-                                        else -> if (isBookRtl) "فصلاً" else "chapters"
+                                    val countUnit = if (isStories) {
+                                        stringResource(id = R.string.detail_unit_stories)
+                                    } else {
+                                        stringResource(id = R.string.detail_unit_chapters)
                                     }
                                     Text(
                                         text = "$countDisplay $countUnit",
@@ -274,7 +273,11 @@ fun BookDetailScreen(
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
-                                        text = if (isBookRtl) "النص باللغة العربية" else "English Text",
+                                        text = if (isBookRtl) {
+                                            stringResource(id = R.string.detail_arabic_text)
+                                        } else {
+                                            stringResource(id = R.string.detail_english_text)
+                                        },
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -309,9 +312,9 @@ fun BookDetailScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = if (hasProgress) {
-                                (if (isBookRtl) "متابعة القراءة" else "Continue Reading") + " (${startChapterIndex + 1})"
+                                stringResource(id = R.string.detail_continue_reading_format, startChapterIndex + 1)
                             } else {
-                                if (isBookRtl) "بدء القراءة" else "Start Reading"
+                                stringResource(id = R.string.btn_start_reading)
                             },
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold
@@ -334,18 +337,20 @@ fun BookDetailScreen(
                                 .padding(16.dp)
                         ) {
                             Text(
-                                text = if (isBookRtl) "نبذة عن الرواية" else "About the Novel",
+                                text = stringResource(id = R.string.detail_about_novel),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
                             )
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = desc,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f),
-                                lineHeight = 24.sp
-                            )
+                            CompositionLocalProvider(LocalLayoutDirection provides bookDirection) {
+                                Text(
+                                    text = desc,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f),
+                                    lineHeight = 24.sp
+                                )
+                            }
                         }
                     }
 
@@ -355,9 +360,9 @@ fun BookDetailScreen(
                 // Chapters List Section Header
                 item {
                     val sectionTitle = when {
-                        isStories -> if (isBookRtl) "قائمة القصص" else "Story List"
-                        isParts -> if (isBookRtl) "الأجزاء والفصول" else "Parts & Chapters"
-                        else -> if (isBookRtl) "قائمة الفصول" else "Chapter List"
+                        isStories -> stringResource(id = R.string.detail_section_stories)
+                        isParts -> stringResource(id = R.string.detail_section_parts)
+                        else -> stringResource(id = R.string.detail_section_chapters)
                     }
                     Text(
                         text = sectionTitle,

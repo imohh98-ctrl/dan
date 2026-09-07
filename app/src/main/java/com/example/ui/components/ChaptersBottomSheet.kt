@@ -96,14 +96,12 @@ fun ChaptersBottomSheet(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val headerTitle = when {
-                        isStories -> if (isBookRtl) "قائمة القصص" else "Stories"
-                        isParts -> if (isBookRtl) "الأجزاء والفصول" else "Parts & Chapters"
-                        else -> if (isBookRtl) "فهرس الفصول" else "Table of Contents"
+                        isStories -> stringResource(id = R.string.detail_section_stories)
+                        isParts -> stringResource(id = R.string.detail_section_parts)
+                        else -> stringResource(id = R.string.screen_chapters)
                     }
-                    val countLabel = when {
-                        isStories -> "${chapters.size} " + if (isBookRtl) "قصة" else "stories"
-                        else -> "${chapters.size} " + if (isBookRtl) "فصل" else "chapters"
-                    }
+                    val unit = if (isStories) stringResource(id = R.string.detail_unit_stories) else stringResource(id = R.string.chapters_count_suffix)
+                    val countLabel = "${chapters.size} $unit"
 
                     Text(
                         text = headerTitle,

@@ -73,7 +73,7 @@ fun NativeAdCard(
                         shape = RoundedCornerShape(4.dp)
                     ) {
                         Text(
-                            text = if (isArabic) "إعلان" else "Ad",
+                            text = stringResource(id = R.string.ad_badge),
                             color = MaterialTheme.colorScheme.onSecondary,
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
@@ -152,7 +152,7 @@ fun NativeAdCard(
                 )
             ) {
                 Text(
-                    text = if (isArabic) "استكشف الآن" else "Explore Now",
+                    text = stringResource(id = R.string.ad_explore_now),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold
                 )

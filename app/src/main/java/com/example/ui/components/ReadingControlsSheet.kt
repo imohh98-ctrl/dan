@@ -88,7 +88,7 @@ fun ReadingControlsSheet(
                 .padding(bottom = 24.dp)
         ) {
             Text(
-                text = if (isArabic) "إعدادات القراءة والمظهر" else "Reading & Display Settings",
+                text = stringResource(id = R.string.reader_settings_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -178,7 +178,7 @@ fun ReadingControlsSheet(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     ) {
-                        Icon(imageVector = Icons.Default.Remove, contentDescription = "Smaller font")
+                        Icon(imageVector = Icons.Default.Remove, contentDescription = stringResource(id = R.string.reader_font_smaller))
                     }
 
                     Spacer(modifier = Modifier.width(14.dp))
@@ -199,7 +199,7 @@ fun ReadingControlsSheet(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     ) {
-                        Icon(imageVector = Icons.Default.Add, contentDescription = "Larger font")
+                        Icon(imageVector = Icons.Default.Add, contentDescription = stringResource(id = R.string.reader_font_larger))
                     }
                 }
             }
@@ -222,9 +222,9 @@ fun ReadingControlsSheet(
                     )
                     Text(
                         text = if (settings.isAutoScrolling) {
-                            if (isArabic) "مفعّلة (${settings.autoScrollSpeed}x)" else "Active (${settings.autoScrollSpeed}x)"
+                            stringResource(id = R.string.auto_scroll_enabled, settings.autoScrollSpeed)
                         } else {
-                            if (isArabic) "متوقفة" else "Paused"
+                            stringResource(id = R.string.auto_scroll_paused)
                         },
                         style = MaterialTheme.typography.bodySmall,
                         color = if (settings.isAutoScrolling) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
@@ -285,13 +285,13 @@ fun ReadingControlsSheet(
                             onClick = { onZoomScaleChange(settings.contentZoomScale - 0.2f) },
                             modifier = Modifier.testTag("zoom_out_btn")
                         ) {
-                            Icon(imageVector = Icons.Default.ZoomOut, contentDescription = "Zoom out")
+                            Icon(imageVector = Icons.Default.ZoomOut, contentDescription = stringResource(id = R.string.reader_zoom_out))
                         }
                         IconButton(
                             onClick = { onZoomScaleChange(settings.contentZoomScale + 0.2f) },
                             modifier = Modifier.testTag("zoom_in_btn")
                         ) {
-                            Icon(imageVector = Icons.Default.ZoomIn, contentDescription = "Zoom in")
+                            Icon(imageVector = Icons.Default.ZoomIn, contentDescription = stringResource(id = R.string.reader_zoom_in))
                         }
                     }
                 }

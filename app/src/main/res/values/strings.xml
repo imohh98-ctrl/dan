@@ -16,11 +16,37 @@
     <!-- Hero & Quotes -->
     <string name="hero_title">Charles Dickens Library</string>
     <string name="hero_subtitle">Journey through Victorian classics and immortal characters</string>
+    <string name="hero_banner_title">Charles Dickens Library</string>
+    <string name="hero_banner_subtitle">Journey through Victorian classics and immortal characters</string>
+    <string name="btn_back">Back</string>
+    <string name="share_app">Share App</string>
+    <string name="dialog_remove">Remove</string>
+    <string name="screen_chapters">Chapters</string>
+    <string name="btn_prev_chapter">Previous Chapter</string>
+    <string name="btn_next_chapter">Next Chapter</string>
     <string name="section_quote_title">Quote of the Day from Charles Dickens</string>
     <string name="btn_share_quote">Share Quote</string>
     <string name="quote_share_format">“%1$s”\n— Charles Dickens (%2$s)\n\nShared from Charles Dickens Library</string>
 
     <!-- Home Empty State & Actions -->
+    <string name="home_section_classics">Charles Dickens Classics</string>
+    <string name="home_books_count">%1$d books</string>
+    <string name="search_clear_desc">Clear search</string>
+    <string name="reader_font_smaller">Smaller font</string>
+    <string name="reader_font_larger">Larger font</string>
+    <string name="reader_zoom_out">Zoom out</string>
+    <string name="reader_zoom_in">Zoom in</string>
+    <string name="detail_about_novel">About the Novel</string>
+    <string name="detail_arabic_text">Arabic Text</string>
+    <string name="detail_english_text">English Text</string>
+    <string name="detail_unit_stories">stories</string>
+    <string name="detail_unit_chapters">chapters</string>
+    <string name="detail_section_chapters">Chapter List</string>
+    <string name="detail_section_stories">Story List</string>
+    <string name="detail_section_parts">Parts &amp; Chapters</string>
+    <string name="detail_continue_reading_format">Continue Reading (%1$d)</string>
+    <string name="detail_share_recommend">I recommend reading \"%1$s\" by Charles Dickens!\nDownload Charles Dickens Library to explore the complete collection.</string>
+
     <string name="empty_library_title">No novels in the library</string>
     <string name="empty_library_desc">The library is currently empty. You can sync or reload novels anytime via Settings.</string>
 
